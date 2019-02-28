@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<title>MyMapPage</title>
+	<link rel="stylesheet" href="../static/css/bootstrap.min.css?v=20190128"/>
+	<link rel="stylesheet" href="../static/css/bootstrap-theme.min.css?v=20190128"/>
+	<style type="text/css">
+		html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";background-image: url('../static/img/bg2.jpg?v=20190128');background-repeat: no-repeat;background-attachment:fixed;}
+		#top{width: 100%;height: 20%;}
+		#div-map{width:100%;height:80%;}
+		#top-nav>li>a{color: #0f0f0f;}
+	</style>
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js?v=20190128"></script>
+	<script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js?v=20190128"></script>
+	<![endif]-->
+</head>
+<body>
+<!--页面头模块-->
+<div id="header" class="page-header">
+	<h1>Bingo's MyMap Page</h1>
+	<!--页面头模块-->
+	<div id="top" class="row">
+		<div class="col-lg-9 col-lg-offset-1 col-xs-10">
+			<ul id="top-nav" class="nav nav-pills">
+				<li role="presentation"><a href="/html/index"><b>NoteBook</b></a></li>
+				<li role="presentation" class="active"><a href="/html/mymap"><b>MyMap</b></a></li>
+				<li role="presentation"><a href="/html/fileupload"><b>FileUpload</b></a></li>
+			</ul>
+		</div>
+		<div class="col-lg-2 col-xs-2">
+			<label id="user-name"></label>
+			<a class="btn btn-link" href="/user/logout" role="button">注销</a>
+		</div>
+	</div>
+</div>
+
+<div id="div-map"></div>
+
+</body>
+</html>
+
+<!-- JavaScript is here -->
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../static/js/jquery.min.js?v=20190128"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="../static/js/bootstrap.min.js?v=20190128"></script>
+<!--baidumap-->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=R5GFBRgNeon8pO6exzsesL0zPBXNoO4b"></script>
+<script src="../static/js/global.properties.js"></script>
+<script type="text/javascript">
+    var map = null;
+    var point = null;
+        function mapInit() {
+            map = new BMap.Map("div-map");
+            point = new BMap.Point(119.98052,30.530827);
+            // 创建点坐标
+            map.centerAndZoom(point, 15);// 初始化地图，设置中心点坐标和地图级别
+            map.enableScrollWheelZoom(true);//开启鼠标滚轮缩放
+
+            var geolocation = new BMap.Geolocation();
+            geolocation.getCurrentPosition(function(r){
+                if(this.getStatus() == BMAP_STATUS_SUCCESS){
+                    var mk = new BMap.Marker(r.point);
+                    map.addOverlay(mk);
+                    map.panTo(r.point);
+                    point = r.point;
+                }
+                else {
+                    alert('failed'+this.getStatus());
+                }
+            },{enableHighAccuracy: true});
+            var geolocationControl = new BMap.GeolocationControl();
+            geolocationControl.addEventListener("locationSuccess", function(e){
+                // 定位成功事件
+                var mk = new BMap.Marker(point);
+                map.addOverlay(mk);
+            });
+            geolocationControl.addEventListener("locationError",function(e){
+                // 定位失败事件
+                alert(e.message);
+            });
+            map.addControl(geolocationControl);
+
+            //开始添加控件
+            //map.addControl(new BMap.NavigationControl());//左上角缩放控件
+            map.addControl(new BMap.ScaleControl());//左下角比例尺
+            map.addControl(new BMap.OverviewMapControl());//右下角可折叠的缩略地图
+            map.addControl(new BMap.MapTypeControl());//右上角地图类型
+
+            // 定义一个控件类,即function
+            function ZoomControl(){
+                // 默认停靠位置和偏移量
+                this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+                this.defaultOffset = new BMap.Size(10, 10);
+            }
+            // 通过JavaScript的prototype属性继承于BMap.Control
+            ZoomControl.prototype = new BMap.Control();
+            // 自定义控件必须实现自己的initialize方法,并且将控件的DOM元素返回
+            // 在本方法中创建个div元素作为控件的容器,并将其添加到地图容器中
+            ZoomControl.prototype.initialize = function(map){
+                // 在本方法中创建个div元素作为控件的容器,并将其添加到地图容器中
+                // 创建一个DOM元素
+                var div = document.createElement("div");
+                div.className = "div_btn_tool btn-group";
+                // 设置样式
+                div.style.cursor = "pointer";
+                div.style.border = "1px solid gray";
+                // 添加DOM元素到地图中
+                map.getContainer().appendChild(div);
+                // 将DOM元素返回
+                return div;
+            }
+            // 创建控件
+            var myZoomCtrl = new ZoomControl();
+            // 添加到地图当中
+            map.addControl(myZoomCtrl);
+            $(".div_btn_tool").attr("role","group");
+            $(".div_btn_tool").append("<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">搜索周边<span class=\"caret\"></span>\n" +
+                "</button>\n" +
+                "<ul class=\"dropdown-menu\">\n" +
+                "    <li><a class=\"btn btn-info\" href=\"javascript:void(0)\" onclick=\"searchMap('公厕')\">公厕</a></li>\n" +
+                "    <li><a class=\"btn btn-info\" href=\"javascript:void(0)\" onclick=\"searchMap('餐馆')\">餐馆</a></li>\n" +
+                "    <li><a class=\"btn btn-info\" href=\"javascript:void(0)\" onclick=\"searchMap('网吧')\">网吧</a></li>\n" +
+                "    <li><a class=\"btn btn-info\" href=\"javascript:void(0)\" onclick=\"searchMap('公交站')\">公交站</a></li>\n" +
+                "</ul>");
+        }
+
+    //地图查找方法
+    function searchMap(pointName){
+        map.clearOverlays();
+        map.enableScrollWheelZoom();
+        map.centerAndZoom(point,15);
+        var circle = new BMap.Circle(point,1000,{fillColor:"#D9EBFF", strokeWeight: 1 ,fillOpacity: 0.3, strokeOpacity: 0.3});
+        map.addOverlay(circle);
+        var local =  new BMap.LocalSearch(map, {renderOptions: {map: map, autoViewport: false}});
+        local.searchNearby(pointName,point,1000);
+    }
+
+
+    //页面加载函数
+    $(document).ready(function(){
+        $("#user-name").html(localStorage.getItem("user_name")+"("+localStorage.getItem("user_role")+")");
+        mapInit();
+    });
+</script>

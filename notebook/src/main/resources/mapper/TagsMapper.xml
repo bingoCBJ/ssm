@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 指定工作空间，要与接口名相同，源代码没有去看，猜测应该是通过"这里的namespace.下边方法的id"来定位方法的 -->
+<mapper namespace="com.ssm.notebook.mapper.TagDao">
+
+    <resultMap id="tagList" type="com.ssm.notebook.model.Tag">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <!-- find AllTag -->
+    <select id="getAllTag" resultMap="tagList">
+        SELECT * FROM python.tag
+    </select>
+
+    <select id="getTagById" parameterType="com.ssm.notebook.model.Tag" resultMap="tagList">
+        SELECT * FROM python.tag WHERE id = #{tag.id}
+    </select>
+
+    <!-- insert tag -->
+    <insert id = "addTag" parameterType="com.ssm.notebook.model.Tag" useGeneratedKeys="true">
+        INSERT INTO python.tag(name,status) VALUES(#{tag.name},"1")
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tag.id">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+
+</mapper>

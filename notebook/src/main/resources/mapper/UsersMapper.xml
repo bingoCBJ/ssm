@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 指定工作空间，要与接口名相同，源代码没有去看，猜测应该是通过"这里的namespace.下边方法的id"来定位方法的 -->
+<mapper namespace="com.ssm.notebook.mapper.UserDao">
+
+    <resultMap id="user" type="com.ssm.notebook.model.User">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+    </resultMap>
+
+    <select id="loadUserByUsername" resultMap="user" parameterType="java.lang.String">
+        SELECT * FROM python.user WHERE name = #{name}
+    </select>
+   <!--  find AllNote
+    <select id="getAllNote" resultMap="noteList01">
+        SELECT id,tag_id,content,title,url,status,create_time FROM python.note
+    </select>
+
+    <select id="getNoteByTag" resultMap="noteList01" parameterType="com.ssm.notebook.model.Tag">
+        SELECT id,tag_id,content,title,url,status,create_time FROM python.note WHERE tag_id = #{tag.id}
+    </select>
+
+    <select id="getNoteById" resultMap="noteList02" parameterType="com.ssm.notebook.model.Note">
+        SELECT * FROM python.note WHERE id = #{note.id}
+    </select>
+
+    &lt;!&ndash; insert tag &ndash;&gt;
+    <insert id = "addNote" parameterType="com.ssm.notebook.model.Note" useGeneratedKeys="true">
+        INSERT INTO python.note(tag_id,content,title,url,status,create_time)
+        VALUES(#{note.tag_id},#{note.contents},#{note.title},#{note.url},"1",#{note.create_time})
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="note.id">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>-->
+</mapper>
+

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>文件上传实例</title>
+	<link rel="stylesheet" href="../static/css/bootstrap.min.css?v=20190128"/>
+	<link rel="stylesheet" href="../static/css/bootstrap-theme.min.css?v=20190128"/>
+	<link rel="stylesheet" href="../static/css/webuploader.css?v=20190128"/>
+	<style type="text/css">
+		body{
+			background-image: url('../static/img/bg2.jpg?v=20190128');
+			background-repeat: no-repeat;
+			background-attachment:fixed;
+		}
+		#top-nav>li>a{color: #0f0f0f;}
+		#picker div:nth-child(2){width:100%!important;height:100%!important;}
+        .webuploader-pick{height: 250px;}
+	</style>
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js?v=20190128"/>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js?v=20190128"/>
+    <![endif]-->
+</head>
+<body>
+
+<div id="bodyDiv" class="container">
+
+	<!--页面头模块-->
+	<div id="header" class="page-header">
+		<!--<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bingo's NoteBook Index Page</h1>-->
+		<!--页面头模块-->
+		<div id="top" class="row">
+			<div class="col-lg-9 col-lg-offset-1">
+				<ul id="top-nav" class="nav nav-pills">
+					<li role="presentation"><a href="/html/index"><b>NoteBook</b></a></li>
+					<li role="presentation"><a href="/html/mymap"><b>MyMap</b></a></li>
+					<li role="presentation" class="active"><a href="/html/fileupload"><b>FileUpload</b></a></li>
+				</ul>
+			</div>
+			<div class="col-lg-2">
+				<label id="user-name"></label>
+				<a class="btn btn-link" href="/user/logout" role="button">注销</a>
+			</div>
+		</div>
+	</div>
+
+    <div id="fileDownLoad" class="row">
+
+    </div>
+
+
+	<div id="center">
+		<!-- Button trigger modal 模态框 -->
+		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target=".bs-example-modal-lg">
+			上传文件
+		</button>
+
+		<!-- Modal -->
+		<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header alert alert-info" role="alert">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<div class="row">
+							<h1 class="modal-title col-md-10" id="myModalLabel"><strong>Upload file</strong></h1>
+							<h1 class="modal-title col-md-1"><strong><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span></strong></h1>
+						</div>
+					</div>
+					<div class="modal-body">
+						<!--头部，文件选择和格式选择-->
+						<div id="uploader" class="wu-example">
+							<div class="row">
+                                <div id="dndArea" class="col-lg-11" style="height: 250px;border-style: dashed;">
+                                    <!--用来存放文件信息-->
+                                    <div id="fileList" class="uploader-list"></div>
+                                </div>
+								<div id="picker" class="col-lg-1" >选择要添加的文件<span class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
+							</div>
+						</div>
+						<!-- 上传结束 -->
+					</div>
+					<div class="modal-footer">
+						<div class="row">
+							<!--<button  type="button" class="btn btn-info col-lg-1 col-lg-offset-8" data-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-info col-lg-1" data-dismiss="modal">Close</button>-->
+							<div class="col-lg-1 col-lg-offset-10">
+								<button id="uploadFileBtn" class="btn btn-primary" style="display: none;">上传</button>
+							</div>
+							<div class="col-lg-1">
+								<button id="modalClose" type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 模态框结束 -->
+	</div>
+
+</div>
+
+
+<!-- JavaScript is here -->
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../static/js/jquery.min.js?v=20190128"></script>
+<script src="../static/js/bootstrap.min.js?v=20190128"></script>
+<script src="../static/js/webuploader.min.js?v=20190128"></script>
+<script src="../static/js/global.properties.js"></script>
+    
+<script type="text/javascript">
+	var myObj = new Object();
+
+    var url = getTotalUrl();
+    var user_id = localStorage.getItem("user_id");
+    myObj.user_id = user_id;
+    myObj.md5Str = "";
+    //待上传文件的md5值（key为file id）
+    var md5 = {};
+
+    //上传组件常用配置
+    var uploader = WebUploader.create({
+        // swf文件路径getTotalUrl() +
+        swf:  '../static/js/Uploader.swf',
+        // 文件接收服务端。
+        server: url+'/file/upload',
+        // 选择文件的按钮。可选。
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#picker', /*{
+                id: '#picker',
+                label: '点击选择文件',
+                name:"multiFile"
+            }*/
+        //指定Drag And Drop拖拽的容器
+        dnd: '#dndArea',
+        //指定监听paste事件的容器
+        paste: '#center',
+        //设置文件上传域的name
+        fileVal:'multiFile',
+        method:'POST',
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false,
+        // 是否分片上传
+        chunked: false,
+        //允许同时最大上传进程数。
+        threads: 1,
+        //重复上传
+        duplicate: false,
+        // 禁掉全局的拖拽功能。这样不会出现图片拖进页面的时候，把图片打开。
+        disableGlobalDnd: true,
+        //验证文件总数量, 超出则不允许加入队列。
+        fileNumLimit: 6,
+        //验证单个文件大小是否超出限制, 超出则不允许加入队
+        fileSingleSizeLimit:100 * 1024 *1024,
+        //每次发送都会发送此对象中的参数
+        //formData:{"user_id":user_id,"md5Str":md5Str}
+    });
+
+    // 当有文件被添加进队列的时候
+    uploader.on( 'fileQueued', function( file ) {
+        md5[file.id] = '';
+        uploader.md5File( file ).then(function(val) {
+            md5[file.id] = val;
+            console.log('md5 result:', md5[file.id]);
+        });
+
+        $("#fileList").append( '<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '<span class="state label label-info">等待上传...</span></h4>' +
+            '</div>' );
+        $("#uploadFileBtn").css("display","block");
+    });
+
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on( 'uploadProgress', function( file, percentage ) {
+        var $li = $( '#'+file.id ),
+            $percent = $li.find('.progress .progress-bar');
+
+        // 避免重复创建
+        if ( !$percent.length ) {
+            $percent = $('<div class="progress progress-striped active">' +
+                '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>').appendTo( $li ).find('.progress-bar');
+        }
+
+        $li.find('span.state').text('【上传中】');
+
+        $percent.css( 'width', percentage * 100 + '%' );
+    });
+
+    uploader.on( 'uploadStart', function( file ) {
+
+        myObj.md5Str = md5[file.id];
+        uploader.options.formData = myObj;
+    });
+
+    uploader.on( 'uploadSuccess', function( file ,response ) {
+        $( '#'+file.id ).find('span.state').text('【已上传】');
+        $( '#'+file.id ).on('click', '.remove-this', function() {
+            uploader.removeFile( file );
+        });
+        console.log('success result:', response);
+    });
+
+    uploader.on( 'uploadError', function( file ) {
+        $( '#'+file.id ).find('span.state').text('【上传出错】');
+    });
+
+    uploader.on( 'uploadComplete', function( file ) {
+        $( '#'+file.id ).find('.progress').fadeOut();
+    });
+
+    // WebUploader提供的钩子（hook），在文件上传前先判断服务是否已存在这个文件
+    /*uploader.register({
+        'before-send-file': 'beforeSendFile' //整个文件上传前
+    }, {
+        beforeSendFile: function( file ) {
+            var that = this;
+            var deferred = WebUploader.Deferred();
+            //上传前请求服务端,判断文件是否已经上传过
+            $.post("http://www.hangge.com/checkFileExist.php", { md5: md5[file.id] },
+                function(data){
+                    if (data == '1') {
+                        //跳过如果存在则跳过
+                        that.owner.skipFile( file );
+                        alert("文件已存在，无需上传！");
+                    }
+                    // 继续后面行为
+                    deferred.resolve();
+                });
+            return deferred.promise();
+        }
+    });*/
+
+    //点击上传按钮触发事件
+    $("#uploadFileBtn").click(function(){
+        uploader.upload();
+    });
+    $("#modalClose").click(function(){
+        $("#fileList").empty();
+    });
+
+    $(document).ready(function() {
+        $("#user-name").html(localStorage.getItem("user_name")+"("+localStorage.getItem("user_role")+")");
+        /*//模态框操作
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').focus()
+        });*/
+
+    });
+
+
+
+</script>
+
+</body>
+</html>

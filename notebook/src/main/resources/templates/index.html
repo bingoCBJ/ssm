@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Cache-Control" content="Public">
+	<title>index</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css?v=20190128"/>
+    <link rel="stylesheet" href="../static/css/bootstrap-theme.min.css?v=20190128"/>
+	<style type="text/css">
+		body{
+			background-image: url('../static/img/bg2.jpg?v=20190128');
+			background-repeat: no-repeat; 
+			background-attachment:fixed;
+		}
+		#bodyDiv{
+			position: absolute;
+			top:0;
+			left:0;
+			bottom: 0;
+			width:100%;
+		}
+		#tag-ul>li>a{
+			color:black;
+		}
+		.w-e-toolbar{
+			background-color:white;
+			opacity:0.9;
+		}
+		.w-e-text-container{
+			background-color:white;
+			opacity:0.8;
+		}
+		#top-nav>li>a{
+			color: #0f0f0f;
+		}
+	</style>
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js?v=20190128"></script>
+		<script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js?v=20190128"></script>
+	<![endif]-->
+</head>
+<body>
+	<div id="bodyDiv" class="container">
+		<!--页面头模块-->
+		<div id="header" class="page-header">
+			<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bingo's NoteBook Index Page</h1>
+			<!--页面头模块-->
+			<div id="top" class="row">
+				<div class="col-lg-9 col-lg-offset-1">
+					<ul id="top-nav" class="nav nav-pills">
+						<li role="presentation" class="active"><a href="/html/index"><b>NoteBook</b></a></li>
+						<li role="presentation"><a href="/html/mymap"><b>MyMap</b></a></li>
+						<li role="presentation"><a href="/html/fileupload"><b>FileUpload</b></a></li>
+					</ul>
+				</div>
+				<div class="col-lg-2">
+					<label id="user-name"></label>
+					<a class="btn btn-link" href="/user/logout" role="button">注销</a>
+				</div>
+			</div>
+		</div>
+
+		
+		<!--页面中模块-->
+		<div id="mid" class="row">
+			<!--左模块-->
+			<div id="mid-left" class="col-lg-2">
+
+				<!--标题列表(只受全局栅栏格式约束)-->
+				<nav class="bs-docs-sidebar affix col-lg-1 col-lg-offset-1">
+					<ul id="tag-ul" class="nav nav-pills nav-stacked">
+						<li id="tag-li0" role="presentation" class="active" code="0"><a href="javascript:void(0)" onclick="addTitleActive(0)"><b>全部笔记</b></a></li>
+					</ul>
+					<a class="back-to-top" href="#top">
+						<span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+						返回顶部
+					</a>
+                    <br/>
+                    <a id="refresh"  class="back-to-top" href="javascript:void(0)" onclick="refreshHtml()">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        刷新页面
+                    </a>
+				</nav>
+			</div>
+			
+			<!--中模块-->
+			<div ii="mid-center" class="col-lg-8">
+
+				<!--标题列表-->
+				<div id="titles" class="col-lg-12">
+				</div>
+
+				<!--编辑器表单-->
+				<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+					<div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content">
+							<!--top-->
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title">添加笔记</h4>
+							</div>
+							<!--mid-->
+							<div class="modal-body">
+								<div id="wang-editor" style="display: block;">
+									<form class="form-horizontal">
+										<div class="form-group">
+											<div class="col-lg-4">
+												<input type="text" class="form-control" id="exampleInputTitle" placeholder="标题">
+											</div>
+                                            <div class="col-lg-4">
+                                                <select id="tag-select" class="form-control">
+                                                    <option>请添加分类</option>
+                                                </select>
+											</div>
+											<div class="col-lg-4">
+                                                <input type="text" class="form-control" id="exampleInputUrl"
+                                                       placeholder="链接">
+                                            </div>
+                                        </div>
+										<div class="form-group">
+											<div id="editor" class="col-lg-12">
+												<p>欢迎使用 <b>wangEditor</b> 富文本编辑器</p>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<!--bottom-->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								<button id="btn-submit" type="button" class="btn btn-primary" onclick="addNote()">Submit</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+			</div>
+			
+			<!--右模块-->
+			<div ii="mid-rigth" class="col-lg-2">
+				<div class="row bs-docs-sidebar affix">
+					<!-- 新增按钮 -->
+					<div class="btn-group col-lg-12">
+						<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							新增 <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:void(0)" onclick="openAddTagModel()">新增分类</a></li>
+							<li><a href="javascript:void(0)" data-toggle="modal"  onclick="openAddTitleModel()">新增笔记</a></li>
+						</ul>
+					</div>
+					<!--添加分类-->
+					<div id="addTags" class="col-lg-12">
+						<!-- /input-group -->
+						<div id="addTagModel" class="input-group" style="display: none;">
+							<input id="tagMsg" type="text" class="form-control" placeholder="新增分类"/>
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" onclick="addTag()">添加</button>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		
+		<!--页面底模块-->
+		<div id="bottom" class="row">
+		</div>
+		
+		<!--隐藏存储某模块-->
+		<div class="row" style="display: none;">
+				<div id="test01" class="col-lg-6 col-lg-offset-3">
+					用于隐藏存储某些表单数据
+				</div>
+		</div>
+	</div>
+	<!-- JavaScript is here -->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="../static/js/jquery.min.js?v=20190128"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="../static/js/bootstrap.min.js?v=20190128"></script>
+	<script src="../static/js/md5.js?v=20190128"></script>
+	<script src="../static/js/wangEditor.min.js?v=20190128"></script>
+	<script src="../static/js/global.properties.js"></script>
+	<script type="text/javascript">
+		//页面加载函数	
+		$(document).ready(function(){
+			//alert("载入页面");
+			//var username = getCookie("username");
+			$("#user-name").html(localStorage.getItem("user_name")+"("+localStorage.getItem("user_role")+")");
+            getTags();
+			getAllNote();
+		});
+
+		//全局变量
+		var totalUrl = getTotalUrl();
+		//创建富文本编辑器
+		var E = window.wangEditor;
+		var editor = new E('#editor');
+		editor.customConfig.uploadImgShowBase64 = true;   // 使用 base64 保存图片
+		editor.create();
+
+        /*function getCookie(name) {
+            var cookies = document.cookie;
+            var list = cookies.split("; ");          // 解析出名/值对列表
+
+            for(var i = 0; i < list.length; i++) {
+                var arr = list[i].split("=");          // 解析出名和值
+                if(arr[0] == name)
+                    return decodeURIComponent(arr[1]);   // 对cookie值解码
+            }
+            return "";
+        }*/
+		
+		function openAddTagModel(){
+            $("#addTagModel").fadeToggle();
+		}
+
+		function addTag(){
+            submitTagMsg();
+            $("#addTagModel").fadeToggle();
+		}
+
+        function openAddTitleModel(){
+            //$("#wang-editor").fadeToggle();
+			$('.bs-example-modal-lg').modal({
+				keyboard: true
+			});
+        }
+
+        function addNote(){
+            submitNoteForm();
+            $('.bs-example-modal-lg').modal('hide');
+        }
+		
+		//为分类列表的a标签添加事件
+		function addTitleActive(n){
+			$("#tag-ul").find("li").attr("class","");
+			$('#tag-li'+n).attr("class","active");
+			$('#tag-li'+n).attr("disabled","disabled")
+			$("#title-list-"+n).css("display","block");
+			$("#titles").children().not("#title-list-"+n).css("display","none");
+
+
+		}
+
+		//添加分类到服务器
+        function submitTagMsg(){
+            var tagName = $("#tagMsg").val();
+            if(tagName==""||tagName==null){
+                return;
+			}else {
+				$.ajax({
+					type : "POST",
+					async : false,
+					url : totalUrl+"/index/addTag",
+					data : {"tagName":tagName},
+					success: function(msg){
+						var jsonObj = JSON.parse(msg);
+						$("#tag-ul").append('<li id="tag-li'+jsonObj.num+'" ' +
+							'role="presentation" class=""  code="'+jsonObj.num+'">' +
+							'<a href="javascript:void(0)" onclick="addTitleActive('+jsonObj.num+')">' +
+							'<b>'+tagName+'</b></a></li>');
+						$("#tag-select").append('<option num="'+jsonObj.num+'">'+tagName+'</option>');
+
+					},
+					error : function() {
+						alert("!!!异常:submitTagMsg");
+					}
+				});
+            }
+        }
+
+        //添加笔记到服务器
+		function submitNoteForm(){
+			var title = $("#exampleInputTitle").val();
+			var tag = $("#tag-select option:selected").attr("num");
+			var url = $("#exampleInputUrl").val();
+			var content = editor.txt.html();
+			if(title==""||title==null||content==null){
+			    alert("笔记标题或笔记内容不能为空！");
+			    return;
+			}
+			$.ajax({
+				type : "POST",
+				async : false,
+				url : totalUrl+"/index/addNote",
+				//dataType: json/xml/html,
+				data : {"title":title,"tag_id":tag,"url":url,"content":content},
+				success: function(msg){
+                    var tag_name = getTagById(tag);
+                    var jsonObj = JSON.parse(msg);
+                    var createTime = jsonObj.create_time;
+                    var htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonObj.num+'" class="list-group-item list-group-item-danger"><span class="badge">'
+						+tag_name+'</span>'
+						+title+
+						'</a>';
+                    $("#title-list-0").append(htmlStr);
+                    htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonObj.num+'" class="list-group-item list-group-item-danger"><span class="badge">'
+                        +createTime+'</span>'
+                        +title+
+                        '</a>';
+                    $("#title-list-"+tag).append(htmlStr);
+                    addTitleActive(tag);
+				},
+				error : function() {
+					alert("!!!异常:submitNoteForm");
+				} 
+			});
+		}	
+		
+		//获取所有分类
+		function getTags(){
+			$("#tag-ul").empty();
+			$("#tag-select").empty();
+			var jsonStr = '';
+			$.ajax({
+				async : false,
+				type : "GET",
+				//content-type : "text/html;charset=UTF-8",
+				url : totalUrl+"/index/getTags",
+				success: function(msg){
+					jsonStr = msg;
+                    var jsonList = JSON.parse(jsonStr);
+                    for(var j = 0,len = jsonList.length; j < len; j++){
+                        var htmlStr = "";
+                        var htmlStrSelect = "";
+                        var htmlTitlesDiv = "";
+                        if(j==0){
+							htmlStr = '<li id="tag-li0" role="presentation" class="active"  code="0"><a href="javascript:void(0)" onclick="addTitleActive(0)"><b>全部笔记</b></a></li>';
+							$("#tag-ul").append(htmlStr);
+                            htmlTitlesDiv = '<div id="title-list-0" class="list-group" style="display: block;"><a href="#" class="list-group-item list-group-item-danger">title-list-all</a></div>';
+                            $("#titles").append(htmlTitlesDiv);
+						}
+                        htmlStr = '<li id="tag-li'+jsonList[j].id+'" role="presentation" class="" code="'+jsonList[j].id+'"><a href="javascript:void(0)" onclick="addTitleActive('+jsonList[j].id+')"><b>'+jsonList[j].name+'</b></a></li>';
+						htmlStrSelect = '<option num="'+jsonList[j].id+'">'+jsonList[j].name+'</option>';
+                        htmlTitlesDiv = '<div id="title-list-'+jsonList[j].id+'" class="list-group" style="display: none;"><a href="#" class="list-group-item list-group-item-danger">title-list-'+jsonList[j].name+'</a></div>';
+
+                        $("#tag-ul").append(htmlStr);
+                        $("#tag-select").append(htmlStrSelect);
+                        $("#titles").append(htmlTitlesDiv);
+                        getNoteByTag(jsonList[j].id);
+                    }
+				},
+				error : function() {
+					alert("!!!异常:getTags");
+				} 
+			});
+
+		}
+
+        //获取所有标题列表
+		function getAllNote(){
+			$("#title-list-0").empty();
+			var jsonStr = '';
+            $.ajax({
+                async : true,
+                type : "GET",
+                //content-type : "text/html;charset=UTF-8",
+                url : totalUrl+"/index/getAllNote",
+                success: function(msg){
+                    jsonStr = msg;
+                    var jsonList  = JSON.parse(jsonStr);
+                    for(var j = 0,len = jsonList.length; j < len; j++){
+                        var tag_name = getTagById(jsonList[j].tag_id);
+                        var htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonList[j].id+'" class="list-group-item list-group-item-success"><span class="badge">'+tag_name+'</span>'+jsonList[j].title+'</a>';
+                        if(j%2==0){
+                            htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonList[j].id+'" class="list-group-item list-group-item-info"><span class="badge">'+tag_name+'</span>'+jsonList[j].title+'</a>';
+                        }
+                        $("#title-list-0").append(htmlStr);
+                    }
+                },
+                error : function() {
+                    alert("!!!异常:getAllNote");
+                }
+            });
+
+		}
+
+        //获取标题列表by分类
+		function getNoteByTag(n){
+            var jsonStr = '';
+            $.ajax({
+                async : true,
+                type : "GET",
+                //content-type : "text/html;charset=UTF-8",
+                url :totalUrl+"/index/getNoteByTag",
+                data : {"tag_id":n},
+                success: function(msg){
+                    $("#title-list-"+n).empty();
+                    jsonStr = msg;
+                    var jsonList  = JSON.parse(jsonStr);
+                    for(var j = 0,len = jsonList.length; j < len; j++){
+                        //var tag_name = getTagById(jsonList[j].tag_id);//此处因为直接显示一个大分类，故不用显示标签
+						var create_time = jsonList[j].create_time;
+                        var htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonList[j].id+'" class="list-group-item list-group-item-success"><span class="badge">'+create_time+'</span>'+jsonList[j].title+'</a>';
+                        if(j%2==0){
+                            htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonList[j].id+'" class="list-group-item list-group-item-info"><span class="badge">'+create_time+'</span>'+jsonList[j].title+'</a>';
+                        }
+                        $("#title-list-"+n).append(htmlStr);
+                    }
+                },
+                error : function() {
+                    alert("!!!异常:getNoteByTag");
+                }
+            });
+
+		}
+
+        //获取分类名by分类id
+        function getTagById(n){
+		    var tag_name = '';
+            $.ajax({
+                async : false,
+                type : "GET",
+                //content-type : "text/html;charset=UTF-8",
+                url : totalUrl+"/index/getTagById",
+                data : {"tag_id":n},
+                success: function(msg){
+                    var jsonObj = JSON.parse(msg);
+                    tag_name = jsonObj.name;
+                },
+                error : function() {
+                    tag_name = 'error';
+					alert("!!!异常:getTagById");
+                }
+            });
+            return tag_name;
+        }
+
+        function refreshHtml() {
+		    var pathName = window.location.pathname;
+		    var htmlName = pathName.substring(pathName.lastIndexOf('/')+1);
+		    alert(htmlName);
+            $.ajax({
+                async : false,
+                type : "POST",
+                //content-type : "text/html;charset=UTF-8",
+                url : totalUrl+"/html/refresh",
+                data : {"filename":htmlName},
+                success: function () {
+                    window.location.href = totalUrl+"/html/"+htmlName;
+                }
+            });
+
+        }
+		
+		
+		/*
+		//图片链接转base64
+		function getBase64Image(imgURL) {
+			var img = new Image();
+			img.crossOrigin = '';//img.setAttribute('crossOrigin', 'anonymous');
+			img.src = imgURL; //requestImg(imgURL);
+			var canvas = document.createElement("canvas");
+			canvas.width = img.width;
+			canvas.height = img.height;
+			var ctx = canvas.getContext("2d");
+			var ext = img.src.substring(img.src.lastIndexOf(".")+1).toLowerCase();
+			//alert(ext);
+			
+			img.onload = function(){
+				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+				var base64 = canvas.toDataURL("image/"+ext);
+				alert(base64);
+			}
+		}
+		//图片请求错误，继续请求
+		function requestImg(src){
+			var img = new Image();
+			//img.setAttribute('crossOrigin', 'anonymous')
+			img.src = src;
+			img.onerror = function(){
+			var timeStamp = new Date();
+				requestImg(src+'?'+timeStamp);
+			}
+			
+			return img;
+		}
+		//替换掉图片的url使之转变为base64
+		function replaceImgUrl(){
+			$("#test01").find("img").each(function(){
+				src = $(this).attr("src");
+				//$(this).attr("crossOrigin","Anonymous");
+				getBase64Image(src);
+			});
+			
+		}
+		 
+		
+		function login(){
+			alert("ajax启动");
+			var userid = $("#username").val();
+			var token = hex_md5(userid+$("#password").val());
+			alert(token);
+			$.ajax({
+				type : "POST",
+				async : false,
+				url : urlhand+"/myssm/user/login",
+				//dataType: json/xml/html,
+				data : {"userid":userid,"token":token},
+				success: function(msg){
+					//window.document.body.innerHTML=msg;
+					alert(msg);
+					window.location.href="/myssm/page"+msg;
+				}
+				/*error : function() {
+					alert("异常！");
+				} 
+			}); 
+		};*/
+	
+	</script>
+</body>
+</html>

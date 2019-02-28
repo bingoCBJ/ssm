@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>note</title>
+<link rel="stylesheet" href="../static/css/bootstrap.min.css?v=20190128"/>
+<link rel="stylesheet" href="../static/css/bootstrap-theme.min.css?v=20190128"/>
+<style type="text/css">
+    body{
+        background-image: url('../static/img/bg2.jpg?v=20190128');
+        background-repeat: no-repeat;
+        background-attachment:fixed;
+    }
+    #bodyDiv{
+        position: absolute;
+        top:0;
+        left:0;
+        bottom: 0;
+        width:100%;
+    }
+    #top-nav>li>a{
+        color: #0f0f0f;
+    }
+</style>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<![endif]-->
+</head>
+<body>
+<div id="bodyDiv" class="container">
+
+    <!--页面头模块-->
+    <div id="header" class="page-header">
+        <!--<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bingo's NoteBook Index Page</h1>-->
+        <!--页面头模块-->
+        <div id="top" class="row">
+            <div class="col-lg-9 col-lg-offset-1">
+                <ul id="top-nav" class="nav nav-pills">
+                    <li role="presentation"><a href="/html/index"><b>NoteBook</b></a></li>
+                    <li role="presentation"><a href="/html/mymap"><b>MyMap</b></a></li>
+                    <li role="presentation"><a href="/html/fileupload"><b>FileUpload</b></a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2">
+                <label id="user-name"></label>
+                <a class="btn btn-link" href="/user/logout" role="button">注销</a>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="div-center" class="row" >
+
+        <div id="show-view"  class="col-lg-8 col-lg-offset-2" style="background-color:lightgoldenrodyellow;opacity:1;">
+        </div>
+
+        <div id="div-right" class="row affix col-lg-2 col-lg-offset-10">
+            <div id="title-list" class="list-group">
+                <a href="#" class="list-group-item list-group-item-default disabled">相同类别文章： </a>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <a class="back-to-top" href="#top">
+                    <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                    返回顶部
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+<!-- JavaScript is here -->
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../static/js/jquery.min.js?v=20190128"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="../static/js/bootstrap.min.js?v=20190128"></script>
+<script src="../static/js/global.properties.js"></script>
+<script type="text/javascript">
+    //页面加载函数
+    $(document).ready(function(){
+        $("#user-name").html(localStorage.getItem("user_name")+"("+localStorage.getItem("user_role")+")");
+        getNoteById();
+    });
+
+    var totalUrl = getTotalUrl();
+
+    function getNoteById() {
+        var note_id = gatNoteIdFromUrl();
+        $.ajax({
+            type : "GET",
+            async : false,
+            url : totalUrl+"/index/getNoteById",
+            data : {"note_id":note_id},
+            success: function(msg){
+                var jsonObj = JSON.parse(msg);
+                setShowView(jsonObj);
+                getNoteByTag(jsonObj.tag_id);
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+
+    //获取标题列表by分类
+    function getNoteByTag(n){
+        var jsonStr = '';
+        $.ajax({
+            async : true,
+            type : "GET",
+            //content-type : "text/html;charset=UTF-8",
+            url :totalUrl+"/index/getNoteByTag",
+            data : {"tag_id":n},
+            success: function(msg){
+                //$("#title-list").empty();
+                jsonStr = msg;
+                var jsonList  = JSON.parse(jsonStr);
+                for(var j = 0,len = jsonList.length; j < len; j++){
+                    if (j>=5){
+                        break;
+                    }
+                    //var tag_name = getTagById(jsonList[j].tag_id);//此处因为直接显示一个大分类，故不用显示标签
+                    var htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonList[j].id+'" class="list-group-item list-group-item-warning">'+jsonList[j].title+'</a>';
+                    if(j%2==0){
+                        htmlStr = '<a href="'+totalUrl+'/html/note?num='+jsonList[j].id+'" class="list-group-item list-group-item-info">'+jsonList[j].title+'</a>';
+                    }
+                    $("#title-list").append(htmlStr);
+                }
+            },
+            error : function() {
+                alert("!!!异常:getNoteByTag");
+            }
+        });
+
+    }
+
+    function gatNoteIdFromUrl() {
+        var src = window.location.href;
+        var indexNum = src.indexOf("=");
+        if(indexNum <= 0){
+            return -1;
+        }
+        return src.substr(indexNum+1 , src.length);
+    }
+
+
+    function setShowView(noteObj) {
+        $("#show-view").empty();
+        $("#show-view").append(noteObj.contents);
+        $("#show-view").append("<a href=\""+noteObj.url+"\"><h2>"+noteObj.title+"<small>原文链接</small></h2></a>");
+    }
+
+</script>
+</body>
+</html>
